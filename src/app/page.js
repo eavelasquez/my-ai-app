@@ -1,7 +1,11 @@
-export default function Home () {
+import { Chat } from '@/components/chat'
+
+export const runtime = 'edge'
+
+export default function IndexPage () {
   return (
     <main className='grid h-screen place-content-center'>
-      <h1>My AI App</h1>
+      <Chat />
     </main>
   )
 }

@@ -1,10 +1,10 @@
 import { Configuration, OpenAIApi } from 'openai-edge'
 import { OpenAIStream, StreamingTextResponse } from 'ai'
 
-// Set the runtime to edge
+// IMPORTANT! Set the runtime to edge
 export const runtime = 'edge'
 
-// Create a new OpenAI API instance
+// Create an OpenAI API client (that's edge friendly!)
 const config = new Configuration({
   apiKey: process.env.OPENAI_API_KEY
 })
@@ -17,19 +17,23 @@ const openai = new OpenAIApi(config)
  * @returns {Promise<StreamingTextResponse>}
  */
 export async function POST (req) {
-  // Get the `messages` from the request body
+  // Extract the `messages` from the request body
   const { messages } = await req.json()
 
-  // Request the OpenAI API for the response based on the prompt
+  // Ask OpenAI for a streaming chat completion given the prompt
   const response = await openai.createChatCompletion({
     model: 'gpt-3.5-turbo',
     stream: true,
-    messages,
-    max_tokens: 500,
-    temperature: 0.7,
-    top_p: 1,
-    frequency_penalty: 1,
-    presence_penalty: 1
+    messages: messages.map((message) => ({
+      content: message.content,
+      role: message.role
+    }))
+    // Uncomment the following to customize the chat completion
+    // max_tokens: 500,
+    // temperature: 0.7,
+    // top_p: 1,
+    // frequency_penalty: 1,
+    // presence_penalty: 1
   })
 
   // Convert the response into a friendly text-stream
